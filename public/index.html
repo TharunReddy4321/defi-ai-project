@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeFi AI Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.3);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --success: #4ade80;
+            --danger: #f87171;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 80px;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 20%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 1.25rem;
+            border-radius: 16px;
+            color: white;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-color), #0ea5e9);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--accent-glow);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-row h1 {
+            margin-bottom: 0;
+        }
+
+        /* Specific styles for Dashboard Header to center align */
+        #dashboardSection .header-row {
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        #dashboardSection .header-row button {
+            width: auto;
+            padding: 0.75rem 2rem;
+        }
+
+        .market-sheet {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .sheet-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .indicator-box {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.75rem 0.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .value-small {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 0.25rem;
+        }
+
+        .chart-container {
+            height: 200px;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .text-success {
+            color: var(--success);
+        }
+
+        .text-danger {
+            color: var(--danger);
+        }
+
+        .text-neutral {
+            color: var(--text-secondary);
+        }
+
+        .result-container {
+            margin-top: 2rem;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .prediction-box {
+            background: rgba(56, 189, 248, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .prediction-label {
+            color: var(--accent-color);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .prediction-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .loader {
+            display: none;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--accent-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-msg {
+            color: var(--danger);
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        /* New styles for Navbar and Modal */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-links .nav-btn {
+            background: none;
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-left: 0;
+            /* Removed margin-left in favor of gap */
+            transition: background-color 0.3s ease;
+            width: auto;
+            /* Override global button width */
+        }
+
+        .nav-links .nav-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links .nav-btn.primary {
+            background: var(--accent-color);
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+
+        .nav-links .nav-btn.primary:hover {
+            background: var(--accent-color);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 1001;
+            /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.8);
+            /* Black w/ opacity */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: var(--bg-secondary);
+            margin: 5% auto;
+            /* 15% from the top and centered */
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            width: 90%;
+            /* Could be more responsive */
+            max-width: 400px;
+            position: relative;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal-content button[type="submit"] {
+            margin-top: 1.5rem;
+        }
+
+        .close {
+            color: #aaa;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 0.75rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            /* To make border-bottom overlap */
+            width: auto;
+            /* Override global button width */
+        }
+
+        .auth-tab:hover {
+            color: white;
+        }
+
+        .auth-tab.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .modal-content .error-msg {
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">DeFi AI</div>
+        <div class="nav-links">
+            <button id="navDashboardBtn" class="nav-btn" style="display: none;"
+                onclick="showSection('dashboard')">Dashboard</button>
+            <button id="navPredictBtn" class="nav-btn" onclick="showSection('predict')">Predictor</button>
+            <button id="navLoginBtn" class="nav-btn primary" onclick="openAuthModal()">Login</button>
+            <button id="navLogoutBtn" class="nav-btn" style="display: none;" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAuthModal()">&times;</span>
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
+                <button class="auth-tab" onclick="switchAuthTab('register')">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" style="display: none;" onsubmit="handleRegister(event)">
+                <div class="input-group">
+                    <input type="text" id="regName" placeholder="Full Name" required>
+                </div>
+                <div class="input-group">
+                    <input type="email" id="regEmail" placeholder="Email" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="regPassword" placeholder="Password" required>
+                </div>
+                <button type="submit">Create Account</button>
+            </form>
+            <div id="authError" class="error-msg"></div>
+        </div>
+    </div>
+
+    <!-- Exchange Modal -->
+    <div id="exchangeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeExchangeModal()">&times;</span>
+            <h2>Connect Exchange</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+                Enter your Read-Only API Keys. They are encrypted before storage.
+            </p>
+
+            <form id="exchangeForm" onsubmit="handleConnectExchange(event)">
+                <div class="input-group">
+                    <select id="exchangeSelect"
+                        style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px;">
+                        <option value="binance">Binance</option>
+                        <option value="coinbase">Coinbase</option>
+                        <option value="kucoin">KuCoin</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="apiKey" placeholder="API Key" required>
+                </div>
+                <div class="input-group">
+                    <textarea id="apiSecret" placeholder="API Secret / Private Key" required rows="4"
+                        style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; font-family: monospace;"></textarea>
+                </div>
+                <button type="submit">Connect</button>
+            </form>
+            <div id="exchangeError" class="error-msg"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" style="display: none;">
+            <div class="card">
+                <div class="header-row">
+                    <h1>User Dashboard</h1>
+                    <button class="nav-btn primary" onclick="syncPortfolio()" id="syncBtn">
+                        Sync Portfolio
+                    </button>
+                </div>
+                <p class="subtitle" id="welcomeMsg">Welcome back!</p>
+
+                <div class="market-sheet">
+                    <div class="sheet-item">
+                        <span class="label">Total Portfolio Value</span>
+                        <div class="value" id="portfolioValue">$0.00</div>
+                    </div>
+                    <div class="sheet-item">
+                        <span class="label">Active Strategies</span>
+                        <div class="value">0</div>
+                    </div>
+                </div>
+
+                <!-- Asset List -->
+                <div id="assetList" style="margin-top: 2rem;">
+                    <!-- Assets will be injected here -->
+                </div>
+
+                <div class="prediction-box" id="connectBox">
+                    <div class="prediction-label">Connect Exchange</div>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Connect your Binance or Coinbase
+                        account to sync your portfolio.</p>
+                    <button onclick="openExchangeModal()">Connect Exchange</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Predictor Section -->
+        <div id="predictSection" class="card">
+            <h1>DeFi AI Predictor</h1>
+            <p class="subtitle">Advanced LSTM Model & Market Analysis</p>
+
+            <div class="input-group">
+                <input type="text" id="symbolInput" placeholder="e.g. BTC, ETH, SOL" autocomplete="off">
+            </div>
+
+            <button id="predictBtn" onclick="getPrediction()">
+                Analyze Market & Predict
+            </button>
+
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+                <p style="margin-top: 10px; font-size: 0.9rem; color: var(--text-secondary);">Training LSTM Model...</p>
+            </div>
+
+            <div class="error-msg" id="errorMsg"></div>
+
+            <div class="result-container" id="resultContainer">
+                <div class="header-row">
+                    <div>
+                        <span class="label">Asset</span>
+                        <div class="value" id="assetName">BTC/USDT</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="label">Current Price</span>
+                        <div class="value" id="currentPrice">$0.00</div>
+                    </div>
+                </div>
+
+                <!-- Market Sheet Grid -->
+                <div class="market-sheet">
+                    <div class="sheet-item">
+                        <span class="label">Signal</span>
+                        <div class="value" id="signalValue">NEUTRAL</div>
+                    </div>
+                    <div class="sheet-item">
+                        <span class="label">Confidence</span>
+                        <div class="value" id="confidenceValue">0%</div>
+                    </div>
+                    <div class="sheet-item">
+                        <span class="label">Volatility</span>
+                        <div class="value" id="volatilityValue">0.00</div>
+                    </div>
+                    <div class="sheet-item">
+                        <span class="label">Trend</span>
+                        <div class="value" id="trendValue">FLAT</div>
+                    </div>
+                </div>
+
+                <!-- Technical Indicators -->
+                <div class="indicators-grid">
+                    <div class="indicator-box">
+                        <span class="label">RSI (14)</span>
+                        <div class="value-small" id="rsiValue">0.00</div>
+                    </div>
+                    <div class="indicator-box">
+                        <span class="label">MACD</span>
+                        <div class="value-small" id="macdValue">0.00</div>
+                    </div>
+                    <div class="indicator-box">
+                        <span class="label">EMA (50)</span>
+                        <div class="value-small" id="ema50Value">0.00</div>
+                    </div>
+                    <div class="indicator-box">
+                        <span class="label">EMA (200)</span>
+                        <div class="value-small" id="ema200Value">0.00</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="predictionChart"></canvas>
+                </div>
+
+                <div class="prediction-box">
+                    <div class="prediction-label">Predicted Price (30 Days)</div>
+                    <div class="prediction-value" id="predictedPrice">$0.00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // --- Auth Logic ---
+        const token = localStorage.getItem('token');
+        let currentUser = null;
+
+        if (token) {
+            checkAuth();
+        }
+
+        async function checkAuth() {
+            try {
+                const res = await fetch('/api/user/profile', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    currentUser = data.user;
+                    updateAuthUI(true);
+                    document.getElementById('welcomeMsg').textContent = `Welcome back, ${currentUser.full_name}!`;
+                    updatePortfolioUI(data.portfolio);
+                } else {
+                    logout();
+                }
+            } catch (e) {
+                logout();
+            }
+        }
+
+        function updatePortfolioUI(portfolio) {
+            document.getElementById('portfolioValue').textContent = formatCurrency(portfolio.total_value_usd);
+
+            const assets = JSON.parse(portfolio.assets || '[]');
+            const assetList = document.getElementById('assetList');
+            const connectBox = document.getElementById('connectBox');
+
+            if (assets.length > 0) {
+                connectBox.style.display = 'none';
+                assetList.innerHTML = `
+                    <h3 style="margin-bottom: 1rem;">Your Assets</h3>
+                    <div style="display: grid; gap: 0.5rem;">
+                        ${assets.map(asset => `
+                            <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: bold;">${asset.symbol}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">${asset.amount} ${asset.symbol}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-weight: bold;">${formatCurrency(asset.value_usd)}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">${asset.exchange.toUpperCase()}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                connectBox.style.display = 'block';
+                assetList.innerHTML = '';
+            }
+        }
+
+        function updateAuthUI(isLoggedIn) {
+            document.getElementById('navLoginBtn').style.display = isLoggedIn ? 'none' : 'block';
+            document.getElementById('navLogoutBtn').style.display = isLoggedIn ? 'block' : 'none';
+            document.getElementById('navDashboardBtn').style.display = isLoggedIn ? 'block' : 'none';
+
+            if (isLoggedIn) {
+                closeAuthModal();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            currentUser = null;
+            updateAuthUI(false);
+            showSection('predict');
+        }
+
+        function openAuthModal() {
+            document.getElementById('authModal').style.display = 'block';
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+
+        // --- Exchange Logic ---
+        function openExchangeModal() {
+            document.getElementById('exchangeModal').style.display = 'block';
+        }
+
+        function closeExchangeModal() {
+            document.getElementById('exchangeModal').style.display = 'none';
+        }
+
+        async function handleConnectExchange(e) {
+            e.preventDefault();
+            const exchange = document.getElementById('exchangeSelect').value;
+            const apiKey = document.getElementById('apiKey').value;
+            const apiSecret = document.getElementById('apiSecret').value;
+            const errorDiv = document.getElementById('exchangeError');
+
+            errorDiv.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/exchange/keys', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ exchange, apiKey, apiSecret })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    closeExchangeModal();
+                    alert('Exchange connected! Syncing portfolio...');
+                    syncPortfolio();
+                } else {
+                    errorDiv.textContent = data.error;
+                    errorDiv.style.display = 'block';
+                }
+            } catch (err) {
+                errorDiv.textContent = err.message;
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        async function syncPortfolio() {
+            const btn = document.getElementById('syncBtn');
+            btn.disabled = true;
+            btn.textContent = 'Syncing...';
+
+            try {
+                const res = await fetch('/api/portfolio/sync', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    updatePortfolioUI({
+                        total_value_usd: data.total_value_usd,
+                        assets: JSON.stringify(data.assets)
+                    });
+                } else {
+                    alert('Sync failed: ' + data.error);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Sync failed');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Sync Portfolio';
+            }
+        }
+
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const regForm = document.getElementById('registerForm');
+            const tabs = document.querySelectorAll('.auth-tab');
+
+            if (tab === 'login') {
+                loginForm.style.display = 'block';
+                regForm.style.display = 'none';
+                tabs[0].classList.add('active');
+                tabs[1].classList.remove('active');
+            } else {
+                loginForm.style.display = 'none';
+                regForm.style.display = 'block';
+                tabs[0].classList.remove('active');
+                tabs[1].classList.add('active');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('token', data.token);
+                    location.reload();
+                } else {
+                    document.getElementById('authError').textContent = data.error;
+                    document.getElementById('authError').style.display = 'block';
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const full_name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ full_name, email, password })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    switchAuthTab('login');
+                    document.getElementById('authError').textContent = 'Account created! Please login.';
+                    document.getElementById('authError').style.color = 'var(--success)';
+                    document.getElementById('authError').style.display = 'block';
+                } else {
+                    document.getElementById('authError').textContent = data.error;
+                    document.getElementById('authError').style.display = 'block';
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function showSection(section) {
+            document.getElementById('dashboardSection').style.display = section === 'dashboard' ? 'block' : 'none';
+            document.getElementById('predictSection').style.display = section === 'predict' ? 'block' : 'none';
+        }
+
+        // --- Existing Predictor Logic ---
+        const input = document.getElementById('symbolInput');
+        let chartInstance = null;
+
+        // Allow Enter key to submit
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                getPrediction();
+            }
+        });
+
+        async function getPrediction() {
+            const symbol = input.value.trim();
+            if (!symbol) return;
+
+            const btn = document.getElementById('predictBtn');
+            const loader = document.getElementById('loader');
+            const resultContainer = document.getElementById('resultContainer');
+            const errorMsg = document.getElementById('errorMsg');
+
+            // Reset UI
+            btn.disabled = true;
+            btn.textContent = 'Analyzing...';
+            loader.style.display = 'flex';
+            resultContainer.style.display = 'none';
+            errorMsg.style.display = 'none';
+
+            try {
+                const response = await fetch(`/predict/${symbol}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                updateUI(data);
+                resultContainer.style.display = 'block';
+            } catch (err) {
+                errorMsg.textContent = err.message || 'Failed to fetch prediction. Please try again.';
+                errorMsg.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Analyze Market & Predict';
+                loader.style.display = 'none';
+            }
+        }
+
+        function updateUI(data) {
+            document.getElementById('assetName').textContent = data.symbol;
+            document.getElementById('currentPrice').textContent = formatCurrency(data.current_price);
+            document.getElementById('predictedPrice').textContent = formatCurrency(data.predicted_price_30d);
+
+            // Market Sheet
+            const sheet = data.market_sheet;
+            const signalEl = document.getElementById('signalValue');
+            signalEl.textContent = sheet.signal;
+            signalEl.className = 'value ' + getSignalClass(sheet.signal);
+
+            document.getElementById('confidenceValue').textContent = sheet.confidence_score + '%';
+            document.getElementById('volatilityValue').textContent = sheet.volatility_index;
+
+            const trendEl = document.getElementById('trendValue');
+            trendEl.textContent = data.trend_direction;
+            trendEl.style.color = data.trend_direction === 'UP' ? 'var(--success)' : 'var(--danger)';
+
+            // Indicators
+            document.getElementById('rsiValue').textContent = sheet.rsi;
+            document.getElementById('macdValue').textContent = sheet.macd;
+            document.getElementById('ema50Value').textContent = formatCurrency(sheet.ema_50);
+            document.getElementById('ema200Value').textContent = formatCurrency(sheet.ema_200);
+
+            // Chart
+            renderChart(data.predicted_trend, data.current_price);
+        }
+
+        function getSignalClass(signal) {
+            if (signal.includes('BUY')) return 'text-success';
+            if (signal.includes('SELL')) return 'text-danger';
+            return 'text-neutral';
+        }
+
+        function renderChart(predictedTrend, currentPrice) {
+            const ctx = document.getElementById('predictionChart').getContext('2d');
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            // Create labels for next 30 days
+            const labels = Array.from({ length: predictedTrend.length }, (_, i) => `Day ${i + 1}`);
+
+            // Add current price as the starting point
+            const dataPoints = [currentPrice, ...predictedTrend];
+            const chartLabels = ['Today', ...labels];
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Predicted Price Trend',
+                        data: dataPoints,
+                        borderColor: '#38bdf8',
+                        backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#94a3b8',
+                                maxTicksLimit: 6
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        }
+    </script>
+</body>
+
+</html>
