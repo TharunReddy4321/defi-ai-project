@@ -2,7 +2,7 @@
 
 A comprehensive AI-driven cryptocurrency platform that combines advanced price prediction with real-time portfolio management. This application uses Deep Learning (LSTM) to forecast market trends and integrates directly with major exchanges like Coinbase and Binance to track your actual assets.
 
-![DeFi AI Dashboard](https://via.placeholder.com/800x400?text=DeFi+AI+Dashboard+Preview)
+![DeFi AI Dashboard](https://github.com/TharunReddy4321/defi-ai-project/blob/main/images/dashboard.png)
 
 ## 🚀 Features
 
